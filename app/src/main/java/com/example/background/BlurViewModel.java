@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkContinuation;
 import androidx.work.WorkManager;
 
 import android.app.Application;
@@ -27,6 +28,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.example.background.workers.BlurWorker;
+import com.example.background.workers.CleanupWorker;
+import com.example.background.workers.SaveImageToFileWorker;
 
 import static com.example.background.Constants.KEY_IMAGE_URI;
 
@@ -56,11 +59,21 @@ public class BlurViewModel extends AndroidViewModel {
      */
     void applyBlur(int blurLevel)
     {
-        OneTimeWorkRequest blurRequest =
-                new OneTimeWorkRequest.Builder(BlurWorker.class)
-                        .setInputData(createInputDataForUri())
+        // Add WorkRequest to Cleanup temporary images
+        WorkContinuation continuation =
+                mWorkManager.beginWith(OneTimeWorkRequest.from(CleanupWorker.class));
+        // Add WorkRequest to blur the image
+        OneTimeWorkRequest blurRequest = new OneTimeWorkRequest.Builder(BlurWorker.class)
+                .setInputData(createInputDataForUri())
+                .build();
+        continuation = continuation.then(blurRequest);
+        // Add WorkRequest to save the image to the filesystem
+        OneTimeWorkRequest save =
+                new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
                         .build();
-        mWorkManager.enqueue(blurRequest);
+        continuation = continuation.then(save);
+        // Actually start the work
+        continuation.enqueue();
     }
 
     private Uri uriOrNull(String uriString) {

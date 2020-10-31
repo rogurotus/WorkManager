@@ -18,6 +18,8 @@ package com.example.background;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.work.WorkManager;
+
 import android.app.Application;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -26,8 +28,11 @@ public class BlurViewModel extends AndroidViewModel {
 
     private Uri mImageUri;
 
-    public BlurViewModel(@NonNull Application application) {
+    private WorkManager mWorkManager;
+    public BlurViewModel(@NonNull Application application)
+    {
         super(application);
+        mWorkManager = WorkManager.getInstance(application);
     }
 
     /**

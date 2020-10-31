@@ -18,10 +18,12 @@ package com.example.background;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkContinuation;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.app.Application;
@@ -32,6 +34,8 @@ import com.example.background.workers.BlurWorker;
 import com.example.background.workers.CleanupWorker;
 import com.example.background.workers.SaveImageToFileWorker;
 
+import java.util.List;
+
 import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
 import static com.example.background.Constants.KEY_IMAGE_URI;
 import static com.example.background.Constants.TAG_OUTPUT;
@@ -41,11 +45,16 @@ public class BlurViewModel extends AndroidViewModel {
     private Uri mImageUri;
 
     private WorkManager mWorkManager;
+    private LiveData<List<WorkInfo>> mSavedWorkInfo;
+
     public BlurViewModel(@NonNull Application application)
     {
         super(application);
         mWorkManager = WorkManager.getInstance(application);
+        mSavedWorkInfo = mWorkManager.getWorkInfosByTagLiveData(TAG_OUTPUT);
     }
+
+    LiveData<List<WorkInfo>> getOutputWorkInfo() { return mSavedWorkInfo; }
 
     private Data createInputDataForUri()
     {

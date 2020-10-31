@@ -18,6 +18,7 @@ package com.example.background;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -26,6 +27,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.example.background.workers.BlurWorker;
+
+import static com.example.background.Constants.KEY_IMAGE_URI;
 
 public class BlurViewModel extends AndroidViewModel {
 
@@ -36,6 +39,15 @@ public class BlurViewModel extends AndroidViewModel {
     {
         super(application);
         mWorkManager = WorkManager.getInstance(application);
+    }
+
+    private Data createInputDataForUri()
+    {
+        Data.Builder builder = new Data.Builder();
+        if (mImageUri != null) {
+            builder.putString(KEY_IMAGE_URI, mImageUri.toString());
+        }
+        return builder.build();
     }
 
     /**

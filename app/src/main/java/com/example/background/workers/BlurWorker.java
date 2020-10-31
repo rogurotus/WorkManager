@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -16,6 +17,8 @@ import com.example.background.Constants;
 import com.example.background.R;
 
 import java.io.FileNotFoundException;
+
+import static com.example.background.Constants.KEY_IMAGE_URI;
 
 public class BlurWorker extends Worker
 {
@@ -34,7 +37,7 @@ public class BlurWorker extends Worker
     {
         Context applicationContext = getApplicationContext();
 
-        String resourceUri = getInputData().getString(Constants.KEY_IMAGE_URI);
+        String resourceUri = getInputData().getString(KEY_IMAGE_URI);
         try
         {
             if (TextUtils.isEmpty(resourceUri))
@@ -50,7 +53,10 @@ public class BlurWorker extends Worker
             Uri outputUri = WorkerUtils.writeBitmapToFile(applicationContext, output);
             WorkerUtils.makeStatusNotification("Output is "
                     + outputUri.toString(), applicationContext);
-            return Result.success();
+            Data outputData = new Data.Builder()
+                    .putString(KEY_IMAGE_URI, outputUri.toString())
+                    .build();
+            return Result.success(outputData);
         }
         catch (Throwable throwable)
         {

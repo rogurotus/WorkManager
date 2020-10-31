@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class SaveImageToFileWorker extends Worker
 {
-    SaveImageToFileWorker(
+    public SaveImageToFileWorker(
             @NonNull Context appContext,
             @NonNull WorkerParameters workerParams)
     {
@@ -31,7 +31,6 @@ public class SaveImageToFileWorker extends Worker
     }
     private static final String TAG = SaveImageToFileWorker.class.getSimpleName();
     private static final String TITLE = "Blurred Image";
-    @SuppressLint("ConstantLocale")
     private static final SimpleDateFormat DATE_FORMATTER =
             new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z", Locale.getDefault());
     @NonNull

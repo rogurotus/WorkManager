@@ -37,6 +37,8 @@ public class BlurWorker extends Worker
     {
         Context applicationContext = getApplicationContext();
 
+        WorkerUtils.makeStatusNotification("Blurring image", applicationContext);
+        WorkerUtils.sleep();
         String resourceUri = getInputData().getString(KEY_IMAGE_URI);
         try
         {
@@ -46,13 +48,10 @@ public class BlurWorker extends Worker
                 throw new IllegalArgumentException("Invalid input uri");
             }
             ContentResolver resolver = applicationContext.getContentResolver();
-            // Create a bitmap
             Bitmap picture = BitmapFactory.decodeStream(
                     resolver.openInputStream(Uri.parse(resourceUri)));
             Bitmap output = WorkerUtils.blurBitmap(picture, applicationContext);
             Uri outputUri = WorkerUtils.writeBitmapToFile(applicationContext, output);
-            WorkerUtils.makeStatusNotification("Output is "
-                    + outputUri.toString(), applicationContext);
             Data outputData = new Data.Builder()
                     .putString(KEY_IMAGE_URI, outputUri.toString())
                     .build();
@@ -60,6 +59,7 @@ public class BlurWorker extends Worker
         }
         catch (Throwable throwable)
         {
+
             Log.e(TAG, "Error applying blur", throwable);
             return Result.failure();
         }
